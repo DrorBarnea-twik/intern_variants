@@ -1422,7 +1422,6 @@ let openOverlay;
 let closeOverlay;
 let getCart;
 let populateProductList;
-let clearProductList;
 let productList;
 let cartEmptyDiv;
 let originalCartButton;
@@ -1554,11 +1553,16 @@ function mainJS() {
     let item_count = cartJSON["item_count"];
     let items = cartJSON["items"];
 
-    for (let item of items) {
-      document.querySelector(
-        ".twik-cart-subtotal"
-      ).innerHTML = `${symbol}${numberWithCommas(total_price_CENTS / 100)}`;
+    // for some reason sometimes a second button gets added, probably it's kotanical's artifacts
+    while (document.querySelectorAll(".twik-cart-subtotal").length > 1) {
+      document.querySelector(".twik-cart-subtotal").remove();
+    }
 
+    document.querySelector(
+      ".twik-cart-subtotal"
+    ).innerHTML = `${symbol}${numberWithCommas(total_price_CENTS / 100)}`;
+
+    for (let item of items) {
       $(cartEmptyDiv).hide();
       $(".twik-cart-footer").css({ visibility: "visible" });
       $(productList).show();
@@ -2779,7 +2783,7 @@ function product_finder() {
 
 function check_for_addtc(selector) {
   let test_prod = document.querySelectorAll(selector)[0];
-  if (test_prod.innerHTML.includes("ADD TO CART")) {
+  if (test_prod.innerHTML.toLowerCase().includes("add to cart")) {
     return true;
   } else {
     return false;
@@ -2797,19 +2801,30 @@ function replace_addtc_buttons(selector) {
 
     let itemContent = prod_form.querySelector(".item-content");
     // replace add to cart with custom add to cart
-    itemContent.children[itemContent.children.length - 1].replaceWith(
+    let originalAddToCartButton = [
+      ...itemContent.querySelectorAll("button"),
+    ].filter((btn) => {
+      return btn.textContent.toUpperCase() === "ADD TO CART" ? true : false;
+    })[0];
+
+    let origBtnStyle = window.getComputedStyle(originalAddToCartButton);
+
+    originalAddToCartButton.replaceWith(
       stringToHTML(`
       <div class="twik-add-to-cart-btn-wrapper">
-        <button class="twik-add-to-cart-btn" tw-ref="${data_url}">
-          ADD TO CART
+        <button class="twik-add-to-cart-btn" tw-ref="${data_url}" style="color:${origBtnStyle["color"]};border-bottom: ${origBtnStyle["borderBottom"]};font-size:${origBtnStyle["fontSize"]}">
+          ${originalAddToCartButton.textContent}
         </button>
-        <button class="twik-adding-message" style="display: none;">
+        <button class="twik-adding-message" style="display: none; color:${origBtnStyle["color"]};border-bottom: ${origBtnStyle["borderBottom"]};font-size:${origBtnStyle["fontSize"]}">
           Adding...
         </button>
-        <button class="twik-thankyou-message" style="display: none;">
+        <button class="twik-thankyou-message" style="display: none; color:${origBtnStyle["color"]};border-bottom: ${origBtnStyle["borderBottom"]};font-size:${origBtnStyle["fontSize"]}">
           Thank You!
         </button>
-      </div>
+        <p style="display:none; color:#3D9970;" class="added-to-cart-success"><i
+            style="font:normal normal normal 14px/1 FontAwesome;" class="fa fa-check"></i><span>Added to cart! <a style="border-bottom: 1px solid #50b3da;"
+              href="/cart">View Cart</a> or <a style="border-bottom: 1px solid #50b3da;" href="/collections/all">Continue Shopping</a>.</span></p>      
+        </div>
     `)
     );
 
@@ -2839,7 +2854,7 @@ function create_addtc_buttons(selector) {
       `
       <div class="twik-add-to-cart-btn-wrapper">
         <button class="twik-add-to-cart-btn" tw-ref="${data_url}">
-          ADD TO CART
+          Add To Cart
         </button>
         <button class="twik-adding-message" style="display: none;">
           Adding...
@@ -2847,6 +2862,9 @@ function create_addtc_buttons(selector) {
         <button class="twik-thankyou-message" style="display: none;">
           Thank You!
         </button>
+        <p style="display:none; color:#3D9970;" class="added-to-cart-success"><i
+        style="font:normal normal normal 14px/1 FontAwesome;" class="fa fa-check"></i><span>Added to cart! <a style="border-bottom: 1px solid #50b3da;"
+          href="/cart">View Cart</a> or <a style="border-bottom: 1px solid #50b3da;" href="/collections/all">Continue Shopping</a>.</span></p>  
       </div>
     `
     );
@@ -2878,6 +2896,7 @@ function addToCartButtonClick(prod, data_url) {
       setTimeout(() => {
         prod.querySelector(".twik-thankyou-message").style.display = "none";
         prod.querySelector(".twik-add-to-cart-btn").style.display = "block";
+        prod.querySelector(".added-to-cart-success").style.display = "block";
       }, 1000);
     })
     .catch((error) => {
@@ -2937,18 +2956,6 @@ function find_and_add_product(json_data) {
     });
 }
 
-// run script:
-
-// // open cart side panel if item was just added
-// let added = sessionStorage.getItem("added");
-// if (added == "true") {
-//   console.log("[+] Twik has just added an item, opening cart...");
-//   document.getElementById("sidebar-cart").setAttribute("aria-hidden", "false");
-//   sessionStorage.setItem("added", "false");
-// } else {
-//   console.log("[-] Twik added no previous item added, cart staying hidden...");
-// }
-
 document.head.insertAdjacentHTML(
   "beforeend",
   `
@@ -2957,12 +2964,12 @@ document.head.insertAdjacentHTML(
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
 }
 
   .twik-add-to-cart-btn-wrapper button {
-    text-decoration: underline;
-    text-decoration-color: #c07282; 
-    font-size: 1.3em; 
+    border-bottom: solid 2px #c07282; 
+    font-size: 1em; 
     color: black;
   }
 
