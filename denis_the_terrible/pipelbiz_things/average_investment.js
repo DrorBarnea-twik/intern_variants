@@ -20,31 +20,36 @@ let mainSectionInterval = setInterval(() => {
       .querySelector(".totalInvestorsDiv")
       .querySelector(".blackSpanHomepage")
   ) {
-    desktopMainSection = document.querySelector(".totalInvestorsDiv");
-    desktopGreyHeader = desktopMainSection.querySelector(".greySpanHomepage");
-    desktopBlackText = desktopMainSection.querySelector(".blackSpanHomepage");
+    try {
+      desktopMainSection = document.querySelector(".totalInvestorsDiv");
+      desktopGreyHeader = desktopMainSection.querySelector(".greySpanHomepage");
+      desktopBlackText = desktopMainSection.querySelector(".blackSpanHomepage");
 
-    totalInvested = parseInt(
-      document
-        .querySelector(".totalInvestedDiv")
-        .innerText.match(/([0-9,]+(\.[0-9]{2})?)/)[0]
-        .replaceAll(",", "")
-    );
-    totalInvestors = parseInt(desktopBlackText.innerText.match(/\d+/)[0]);
-    currencySign = document.querySelector(".totalInvestedDiv span").innerText;
+      totalInvested = parseInt(
+        document
+          .querySelector(".totalInvestedDiv")
+          .innerText.match(/([0-9,]+(\.[0-9]{2})?)/)[0]
+          .replaceAll(",", "")
+      );
+      totalInvestors = parseInt(desktopBlackText.innerText.match(/\d+/)[0]);
+      currencySign = document.querySelector(".totalInvestedDiv span").innerText;
 
-    averageInvestment = parseInt(totalInvested / totalInvestors);
-    averageInvestment = numberWithCommas(averageInvestment);
+      averageInvestment = parseInt(totalInvested / totalInvestors);
+      averageInvestment = numberWithCommas(averageInvestment);
 
-    let desktopGreyHeader_clone = desktopGreyHeader.cloneNode(true);
-    desktopGreyHeader_clone.innerText = "ממוצע השקעה";
-    let desktopBlackText_clone = desktopBlackText.cloneNode(true);
-    desktopBlackText_clone.innerText = `${currencySign}${averageInvestment}`;
-    desktopMainSection.appendChild(desktopGreyHeader_clone);
-    desktopMainSection.appendChild(desktopBlackText_clone);
-    desktopGreyHeader_clone.style.marginTop = "24px";
+      let desktopGreyHeader_clone = desktopGreyHeader.cloneNode(true);
+      desktopGreyHeader_clone.innerText = "ממוצע השקעה";
+      let desktopBlackText_clone = desktopBlackText.cloneNode(true);
+      desktopBlackText_clone.innerText = `${currencySign}${averageInvestment}`;
+      desktopMainSection.appendChild(desktopGreyHeader_clone);
+      desktopMainSection.appendChild(desktopBlackText_clone);
+      desktopGreyHeader_clone.style.marginTop = "24px";
 
-    clearInterval(mainSectionInterval);
+      clearInterval(mainSectionInterval);
+    } catch (e) {
+      console.log(`main section fix fail: ${e}`);
+      clearInterval(mainSectionInterval);
+    }
   }
 }, 50);
 
@@ -58,13 +63,11 @@ let mobileMainSectionInterval = setInterval(() => {
 
     let mobileCol_clone = mobileMainSection.children[0].cloneNode(true);
     mobileCol_clone.innerHTML = "";
-    let mobileHeader_clone = mobileMainSection.children[0].children[0].cloneNode(
-      true
-    );
+    let mobileHeader_clone =
+      mobileMainSection.children[0].children[0].cloneNode(true);
     mobileHeader_clone.innerText = "ממוצע השקעה";
-    let mobileText_clone = mobileMainSection.children[0].children[1].cloneNode(
-      true
-    );
+    let mobileText_clone =
+      mobileMainSection.children[0].children[1].cloneNode(true);
     mobileText_clone.innerText = `${currencySign}${averageInvestment}`;
     mobileMainSection.appendChild(mobileHeader_clone);
     mobileMainSection.appendChild(mobileText_clone);
