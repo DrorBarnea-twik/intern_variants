@@ -27,7 +27,7 @@
     "@types/node": "^15.12.2",
     "@types/webpack-env": "^1.16.0",
     "jquery": "^3.6.0",
-    "node-sass": "^6.0.0",
+    "node-sass": "^7.0.0",
     "npm-watch": "^0.10.0",
     "sass": "^1.35.1",
     "ts-loader": "^9.2.3",
